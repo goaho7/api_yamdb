@@ -38,7 +38,7 @@ class Title(models.Model):
     name = models.CharField('название произведения', max_length=256)
     year = models.PositiveSmallIntegerField('год создания произведения', max_length=4)
     genre = models.ForeignKey(Genre, related_name='titles')
-    category = models.ForeignKey(Category, related_name='titles')
+    category = models.ManyToManyField(Category, related_name='titles')
     description = models.CharField(
         'описание произведения',
         max_length=256,

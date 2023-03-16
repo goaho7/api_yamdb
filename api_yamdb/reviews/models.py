@@ -3,6 +3,64 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
 
+class Reviews(models.Model):
+    """Отзывы"""
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата публикации', auto_now_add=True, db_index=True)
+
+
+class Category(models.Model):
+    """Категории произведений"""
+    name = models.CharField('название категории', max_length=256)
+    slug = models.SlugField(
+        'ссылка категории',
+        max_length=50,
+        unique=True,
+        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
+        message='Содержит неизвестный символ')],
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
+    """Жанры произведений"""
+    name = models.CharField('название категории', max_length=256)
+    slug = models.SlugField(
+        'ссылка категории',
+        max_length=50,
+        unique=True,
+        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
+        message='Содержит неизвестный символ')],
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Title(models.Model):
+    """Произведения"""
+
+    name = models.CharField('название произведения', max_length=256)
+    year = models.PositiveSmallIntegerField('год создания произведения', max_length=4)
+    genre = models.ManyToManyField(Genre, related_name='titles')
+    category = models.ForeignKey(Category, related_name='titles')
+    description = models.CharField(
+        'описание произведения',
+        max_length=256,
+        required=False,
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser):
     USER = 'user'
     MODERATOR = 'moderator'
@@ -53,64 +111,3 @@ class User(AbstractUser):
                 name='unique_username_email'
             )
         ]
-
-
-class Reviews(models.Model):
-    """Отзывы"""
-    pass
-    """ author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews')
-    text = models.TextField()
-    pub_date = models.DateTimeField(
-        'Дата публикации', auto_now_add=True, db_index=True) """
-
-
-class Category(models.Model):
-    """Категории произведений"""
-    pass
-    """ name = models.CharField('название категории', max_length=256)
-    slug = models.SlugField(
-        'ссылка категории',
-        max_length=50,
-        unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-        message='Содержит неизвестный символ')],
-    )
-
-    def __str__(self):
-        return self.name """
-
-
-class Genre(models.Model):
-    """Жанры произведений"""
-    pass
-    """ name = models.CharField('название категории', max_length=256)
-    slug = models.SlugField(
-        'ссылка категории',
-        max_length=50,
-        unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-        message='Содержит неизвестный символ')],
-    )
-
-    def __str__(self):
-        return self.name """
-
-
-class Title(models.Model):
-    """Произведения"""
-    pass
-    """ name = models.CharField('название произведения', max_length=256)
-    year = models.PositiveSmallIntegerField('год создания произведения', max_length=4)
-    genre = models.ForeignKey(Genre, related_name='titles')
-    category = models.ManyToManyField(Category, related_name='titles')
-    description = models.CharField(
-        'описание произведения',
-        max_length=256,
-        required=False,
-    )
-
-    def __str__(self):
-        return self.name """

@@ -55,22 +55,9 @@ class User(AbstractUser):
         ]
 
 
-class Reviews(models.Model):
-    """Отзывы"""
-    pass
-    """ author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews')
-    text = models.TextField()
-    pub_date = models.DateTimeField(
-        'Дата публикации', auto_now_add=True, db_index=True) """
-
-
 class Category(models.Model):
     """Категории произведений"""
-    pass
-    """ name = models.CharField('название категории', max_length=256)
+    name = models.CharField('название категории', max_length=256)
     slug = models.SlugField(
         'ссылка категории',
         max_length=50,
@@ -80,13 +67,12 @@ class Category(models.Model):
     )
 
     def __str__(self):
-        return self.name """
+        return self.name
 
 
 class Genre(models.Model):
     """Жанры произведений"""
-    pass
-    """ name = models.CharField('название категории', max_length=256)
+    name = models.CharField('название категории', max_length=256)
     slug = models.SlugField(
         'ссылка категории',
         max_length=50,
@@ -96,16 +82,16 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return self.name """
+        return self.name
 
 
 class Title(models.Model):
     """Произведения"""
-    pass
-    """ name = models.CharField('название произведения', max_length=256)
+
+    name = models.CharField('название произведения', max_length=256)
     year = models.PositiveSmallIntegerField('год создания произведения', max_length=4)
-    genre = models.ForeignKey(Genre, related_name='titles')
-    category = models.ManyToManyField(Category, related_name='titles')
+    genre = models.ManyToManyField(Genre, related_name='titles')
+    category = models.ForeignKey(Category, related_name='titles', on_delete=models.SET_NULL)
     description = models.CharField(
         'описание произведения',
         max_length=256,
@@ -113,4 +99,4 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return self.name """
+        return self.name

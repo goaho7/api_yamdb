@@ -76,10 +76,6 @@ class User(AbstractUser):
         max_length=150,
         verbose_name='Имя пользователя',
         unique=True,
-        validators=[RegexValidator(
-            regex=r'^[\w.@+-]+\z',
-            message='Содержит неверный символ'
-        )],
         help_text=('Required. 150 characters or fewer.'
                    'Letters, digits and @/./+/-/_ only.')
     )
@@ -107,7 +103,6 @@ class User(AbstractUser):
         blank=True,
         max_length=150
     )
-
 
     class Meta:
         constraints = [

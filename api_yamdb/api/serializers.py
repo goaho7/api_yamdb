@@ -1,4 +1,4 @@
-from reviews.models import Reviews
+from reviews.models import Reviews, Category, Genre, Title
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -21,3 +21,27 @@ class ReviewsSerializer(serializers.ModelSerializer):
                 "Вы уже писали отзыв к этому произведению."
             )
         return data
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для категорий произведений"""
+
+    class Meta:
+         fields = '__all__'
+         model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор для жанров произведений"""
+
+    class Meta:
+         fields = '__all__'
+         model = Genre
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор произведений"""
+
+    class Meta:
+         fields = '__all__'
+         model = Title

@@ -10,8 +10,7 @@ User = get_user_model()
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
-    pass
-    """ author = SlugRelatedField(slug_field='username', read_only=True)
+    author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
@@ -27,31 +26,31 @@ class ReviewsSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Вы уже писали отзыв к этому произведению."
             )
-        return data """
+        return data
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений"""
-    pass
-    """ class Meta:
+
+    class Meta:
          fields = '__all__'
-         model = Category """
+         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений"""
-    pass
-    """ class Meta:
+
+    class Meta:
          fields = '__all__'
-         model = Genre """
+         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений"""
-    pass
-    """ class Meta:
+
+    class Meta:
          fields = '__all__'
-         model = Title """
+         model = Title
 
 
 class UserSerializer(serializers.ModelSerializer):

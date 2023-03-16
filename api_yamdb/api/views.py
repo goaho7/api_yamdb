@@ -22,7 +22,7 @@ from api_yamdb.settings import EMAIL
 User = get_user_model()
 
 
-""" class ReviewsViewSet(viewsets.ModelViewSet):
+class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializer
     pagination_class = LimitOffsetPagination
 
@@ -35,29 +35,26 @@ User = get_user_model()
         serializer.save(author=self.request.user, title=title)
 
     def perform_update(self, serializer):
-        serializer.save(author=self.request.user) """
+        serializer.save(author=self.request.user)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """Категории произведений"""
-    pass
-    """ queryset = Category.objects.all()
-    serializer_class = CategorySerializer """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     """Жанры произведений"""
-    pass
-    """ queryset = Genre.objects.all()
-    serializer_class = GenreSerializer """
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Произведения"""
-    pass
-    """ queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
-    pagination_class = PageNumberPagination """
+    pagination_class = PageNumberPagination
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -3,6 +3,17 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
 
+class Reviews(models.Model):
+    """Отзывы"""
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата публикации', auto_now_add=True, db_index=True)
+
+
 class Category(models.Model):
     """Категории произведений"""
     name = models.CharField('название категории', max_length=256)
@@ -96,6 +107,7 @@ class User(AbstractUser):
         blank=True,
         max_length=150
     )
+
 
     class Meta:
         constraints = [

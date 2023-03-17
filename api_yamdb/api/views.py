@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from .permissions import IsAdmin
 
 from api_yamdb.settings import EMAIL
 
@@ -63,7 +64,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    #permission_classes = (IsRoleAdmin,)
+    permission_classes = (IsAdmin,)
 
     @action(
         methods=['GET', 'PATCH'],

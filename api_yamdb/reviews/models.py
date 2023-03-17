@@ -52,6 +52,7 @@ class Title(models.Model):
 
 
 class User(AbstractUser):
+    """Кастомный пользователь"""
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
@@ -101,6 +102,21 @@ class User(AbstractUser):
                 name='unique_username_email'
             )
         ]
+
+    def __str__(self):
+        return self.username
+
+    @property
+    def is_user(self):
+        return self.role == self.USER
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
 
 
 class Reviews(models.Model):

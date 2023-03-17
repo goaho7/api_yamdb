@@ -64,6 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
+    """Сериализатор создания пользователя"""
     email = serializers.EmailField(
         required=True
     )
@@ -97,7 +98,7 @@ class SignupSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.Serializer):
     """Сериализатор для получения JWT токена."""
     username = serializers.RegexField(
-        regex=r'^[\w.@+-]+$',
+        regex=r'^[\w.@+-]+\z',
         max_length=150,
         required=True
     )

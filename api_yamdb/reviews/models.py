@@ -38,7 +38,7 @@ class Title(models.Model):
     """Произведения"""
 
     name = models.CharField('название произведения', max_length=256)
-    year = models.PositiveSmallIntegerField('год создания произведения', validators=validate_year)
+    year = models.PositiveSmallIntegerField('год создания произведения', validators=[validate_year])
     genre = models.ManyToManyField(Genre, related_name='titles')
     category = models.ForeignKey(Category, related_name='titles', on_delete=models.SET_NULL, null=True)
     description = models.CharField(
@@ -67,6 +67,10 @@ class User(AbstractUser):
         max_length=150,
         verbose_name='Имя пользователя',
         unique=True,
+        validators=[RegexValidator(
+            regex=r'^[\w.@+-]+\z',
+            message='Содержит неизвестный символ'
+        )],
         help_text=('Required. 150 characters or fewer.'
                    'Letters, digits and @/./+/-/_ only.')
     )

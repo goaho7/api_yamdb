@@ -1,7 +1,7 @@
 
 from django.contrib.auth import get_user_model
 
-from reviews.models import Reviews, Category, Genre, Title, Comment
+from reviews.models import Review, Category, Genre, Title, Comment
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -9,20 +9,20 @@ from rest_framework.relations import SlugRelatedField
 User = get_user_model()
 
 
-class ReviewsSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для отзывов"""
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
-        model = Reviews
+        model = Review
 
     def validate(self, data):
         if self.context['request'].method != 'POST':
             return data
         title = self.context['view'].kwargs.get('title_id')
         author = self.context['request'].user
-        if Reviews.objects.filter(
+        if Review.objects.filter(
                 author=author, title=title).exists():
             raise serializers.ValidationError(
                 "Вы уже писали отзыв к этому произведению."

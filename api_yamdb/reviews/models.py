@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from .validators import validate_year
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
@@ -123,7 +124,7 @@ class User(AbstractUser):
         return self.role == self.ADMIN
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     """Отзывы"""
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
@@ -132,6 +133,10 @@ class Reviews(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True, db_index=True)
+    score = models.PositiveSmallIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+    )
 
     class Meta:
         constraints = [
@@ -150,9 +155,9 @@ class Comment(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
     review = models.ForeignKey(
-        Reviews, on_delete=models.CASCADE, related_name='comments')
+        Review, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
     def __str__(self):

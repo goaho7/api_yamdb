@@ -1,10 +1,8 @@
 from api.serializers import ReviewSerializer, CommentSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
-from reviews.models import Category, Genre, Review, Title
-from django.shortcuts import render
+from reviews.models import Category, Genre, Reviews, Title
 from rest_framework import filters, viewsets, status
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Avg
 from django.contrib.auth import get_user_model
@@ -16,6 +14,7 @@ from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer
 from .permissions import IsAdmin, IsAuthorModeratorAdminOrReadOnly
 
 from api_yamdb.settings import EMAIL
@@ -71,7 +70,7 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=['GET', 'PATCH'],
         detail=False,
         url_path='me',
-        permission_classes=[IsAuthenticated]
+        permission_classes=(IsAuthenticated,)
     )
     def me_method(self, request):
         """Метод редактирования при запросе на users/me/"""

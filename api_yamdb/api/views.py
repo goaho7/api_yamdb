@@ -1,4 +1,4 @@
-from api.serializers import ReviewsSerializer
+from api.serializers import ReviewsSerializer, CommentSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from reviews.models import Category, Genre, Reviews, Title
@@ -23,6 +23,7 @@ User = get_user_model()
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
+    """Отзывы"""
     serializer_class = ReviewsSerializer
     pagination_class = LimitOffsetPagination
 
@@ -135,3 +136,19 @@ class TokenView(APIView):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         message = {'token': str(AccessToken.for_user(user))}
         return Response(message, status=status.HTTP_200_OK)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Комментарии"""
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        review = get_object_or_404(Reviews, id=self.kwargs.get('review_id'))
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Reviews, id=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)

@@ -1,7 +1,7 @@
 
 from django.contrib.auth import get_user_model
 
-from reviews.models import Reviews, Category, Genre, Title
+from reviews.models import Reviews, Category, Genre, Title, Comment
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -10,6 +10,7 @@ User = get_user_model()
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
+    """Сериализатор для отзывов"""
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
@@ -104,3 +105,15 @@ class TokenSerializer(serializers.Serializer):
         max_length=150,
         required=True
     )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для комментариев"""
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        read_only_fields = ('review',)

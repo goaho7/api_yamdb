@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from .validators import validate_year, validate_regex
 from django.core.validators import RegexValidator
-from .validators import validate_year
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 
 class Category(models.Model):
@@ -12,9 +13,8 @@ class Category(models.Model):
         'ссылка категории',
         max_length=50,
         unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-                    message='Содержит неизвестный символ')],
-                )
+        validators=[validate_regex],
+    )
 
     def __str__(self):
         return self.name
@@ -27,9 +27,8 @@ class Genre(models.Model):
         'ссылка категории',
         max_length=50,
         unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-                    message='Содержит неизвестный символ')],
-                )
+        validators=[validate_regex],
+    )
 
     def __str__(self):
         return self.name

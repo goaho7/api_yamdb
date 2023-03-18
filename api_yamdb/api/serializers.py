@@ -1,4 +1,4 @@
-
+import re
 from django.contrib.auth import get_user_model
 
 from reviews.models import Review, Category, Genre, Title, Comment
@@ -30,28 +30,40 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для комментариев"""
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        read_only_fields = ('review',)
+
+
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений"""
 
     class Meta:
-         fields = '__all__'
-         model = Category
+        fields = '__all__'
+        model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений"""
 
     class Meta:
-         fields = '__all__'
-         model = Genre
+        fields = '__all__'
+        model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений"""
 
     class Meta:
-         fields = '__all__'
-         model = Title
+        fields = '__all__'
+        model = Title
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -77,28 +89,45 @@ class SignupSerializer(serializers.ModelSerializer):
         fields = ('username', 'email')
 
     def validate_username(self, value):
-        if value == 'me' or '':
+        if value.lower() == 'me':
             raise serializers.ValidationError(
                 'Нельзя использовать me в качестве имени пользователя.'
             )
-        if User.objects.filter(username=value).exists():
+        if not re.match(r'^[\w.@+-]+\Z', value):
             raise serializers.ValidationError(
-                'Пользователь username уже зарегистрирован.'
+                'username некорректный.'
+            )
+        if len(value) > 150:
+            raise serializers.ValidationError(
+                'Длина email должна быть меньше 150 символов.'
             )
         return value
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        if len(value) > 254:
             raise serializers.ValidationError(
-                'Такой email уже зарегистрирован.'
+                'Длина email должна быть меньше 254 символов.'
             )
         return value
+
+    def validate(self, data):
+        username = User.objects.filter(username=data.get('username'))
+        email = User.objects.filter(email=data.get('email'))
+        if username and not email:
+            raise serializers.ValidationError(
+                'Пользователь с таким username уже существует'
+            )
+        if email and not username:
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже существует'
+            )
+        return data
 
 
 class TokenSerializer(serializers.Serializer):
     """Сериализатор для получения JWT токена."""
     username = serializers.RegexField(
-        regex=r'^[\w.@+-]+\z',
+        regex=r'^[\w.@+-]+\Z',
         max_length=150,
         required=True
     )
@@ -106,15 +135,3 @@ class TokenSerializer(serializers.Serializer):
         max_length=150,
         required=True
     )
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор для комментариев"""
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = Comment
-        read_only_fields = ('review',)

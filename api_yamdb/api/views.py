@@ -1,21 +1,21 @@
-from api.serializers import ReviewSerializer, CommentSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework.pagination import LimitOffsetPagination
-from reviews.models import Category, Genre, Reviews, Title
 from rest_framework import filters, viewsets, status
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
-from django.db import IntegrityError
 from rest_framework.response import Response
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer
-from .permissions import IsAdmin, IsAuthorModeratorAdminOrReadOnly
+from api.serializers import (CategorySerializer, GenreSerializer,
+                             TitleSerializer, SignupSerializer,
+                             TokenSerializer, UserSerializer,
+                             ReviewSerializer, CommentSerializer)
+from api.permissions import IsAdmin, IsAuthorModeratorAdminOrReadOnly
+from reviews.models import Category, Genre, Review, Title
 
 from api_yamdb.settings import EMAIL
 
@@ -35,6 +35,23 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Комментарии"""
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
+
+    def get_queryset(self):
+        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
@@ -65,6 +82,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
 
     @action(
         methods=['GET', 'PATCH'],
@@ -94,28 +114,19 @@ class SignupView(APIView):
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
-        serializer.is_valid()
-        username = serializer.validated_data.get('username')
-        email = serializer.validated_data.get('email')
-        try:
-            user, created = User.objects.get_or_create(
-                username=username,
-                email=email,
-            )
-        except IntegrityError:
-            return Response(
-                serializer.data, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
+        user, _ = User.objects.get_or_create(
+            **serializer.validated_data,
+        )
         confirmation_code = default_token_generator.make_token(user)
-        User.objects.filter(username=username).update(
+        User.objects.filter(username=user.username).update(
             confirmation_code=confirmation_code
         )
-
         send_mail(
             'Код подтверждения.',
             f'Код для регистрации: {confirmation_code}',
             EMAIL,
-            [email],
+            [f'{user.email}'],
             fail_silently=False,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -127,7 +138,7 @@ class TokenView(APIView):
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
         confirmation_code = serializer.validated_data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
@@ -137,20 +148,3 @@ class TokenView(APIView):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         message = {'token': str(AccessToken.for_user(user))}
         return Response(message, status=status.HTTP_200_OK)
-
-
-class CommentViewSet(viewsets.ModelViewSet):
-    """Комментарии"""
-    serializer_class = CommentSerializer
-    permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
-
-    def get_queryset(self):
-        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        return review.comments.all()
-
-    def perform_create(self, serializer):
-        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        serializer.save(author=self.request.user, review=review)
-
-    def perform_update(self, serializer):
-        serializer.save(author=self.request.user)

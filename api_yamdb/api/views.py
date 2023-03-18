@@ -12,13 +12,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.views import APIView
 
-from api.permissions import IsAdmin, IsAuthorModeratorAdminOrReadOnly
+from api.permissions import IsAdmin, IsAdministratorOrReadOnly, IsAuthorModeratorAdminOrReadOnly
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
                              SignupSerializer, TitleSerializer,
                              TokenSerializer, UserSerializer,)
 from api_yamdb.settings import EMAIL
 from reviews.models import Category, Genre, Review, Title
+from .mixins import CreateListDestroyViewSet
 
 User = get_user_model()
 
@@ -58,18 +59,25 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CreateListDestroyViewSet):
     """Категории произведений"""
     
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateListDestroyViewSet):
     """Жанры произведений"""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -77,6 +85,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
+    permission_classes = (IsAdministratorOrReadOnly,)
     pagination_class = PageNumberPagination
 
 

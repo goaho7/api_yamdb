@@ -41,18 +41,21 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """Категории произведений"""
+    
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     """Жанры произведений"""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Произведения"""
+    
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination

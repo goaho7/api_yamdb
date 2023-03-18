@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
-from .validators import validate_year
+from .validators import validate_year, validate_regex
 
 
 class Category(models.Model):
@@ -11,8 +10,7 @@ class Category(models.Model):
         'ссылка категории',
         max_length=50,
         unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-        message='Содержит неизвестный символ')],
+        validators=[validate_regex],
     )
 
     def __str__(self):
@@ -26,8 +24,7 @@ class Genre(models.Model):
         'ссылка категории',
         max_length=50,
         unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-        message='Содержит неизвестный символ')],
+        validators=[validate_regex],
     )
 
     def __str__(self):
@@ -38,7 +35,7 @@ class Title(models.Model):
     """Произведения"""
 
     name = models.CharField('название произведения', max_length=256)
-    year = models.PositiveSmallIntegerField('год создания произведения', validators=validate_year)
+    year = models.PositiveSmallIntegerField('год создания произведения', validators=[validate_year])
     genre = models.ManyToManyField(Genre, related_name='titles')
     category = models.ForeignKey(Category, related_name='titles', on_delete=models.SET_NULL, null=True)
     description = models.CharField(

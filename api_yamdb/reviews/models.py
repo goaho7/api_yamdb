@@ -69,7 +69,7 @@ class User(AbstractUser):
         verbose_name='Имя пользователя',
         unique=True,
         validators=[RegexValidator(
-            regex=r'^[\w.@+-]+\z',
+            regex=r'^[\w.@+-]+\Z',
             message='Содержит неизвестный символ'
         )],
         help_text=('Required. 150 characters or fewer.'

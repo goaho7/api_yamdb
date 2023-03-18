@@ -1,23 +1,24 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import filters, viewsets, status
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
-from django.db.models import Avg
 from django.contrib.auth import get_user_model
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from rest_framework_simplejwt.tokens import AccessToken
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer, SignupSerializer,
-                             TokenSerializer, UserSerializer,
-                             ReviewSerializer, CommentSerializer)
-from api.permissions import IsAdmin, IsAuthorModeratorAdminOrReadOnly
-from reviews.models import Category, Genre, Review, Title
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.views import APIView
 
+from api.permissions import IsAdmin, IsAuthorModeratorAdminOrReadOnly
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, ReviewSerializer,
+                             SignupSerializer, TitleSerializer,
+                             TokenSerializer, UserSerializer,)
 from api_yamdb.settings import EMAIL
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 

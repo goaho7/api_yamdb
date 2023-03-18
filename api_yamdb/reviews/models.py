@@ -13,8 +13,8 @@ class Category(models.Model):
         max_length=50,
         unique=True,
         validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-        message='Содержит неизвестный символ')],
-    )
+                    message='Содержит неизвестный символ')],
+                )
 
     def __str__(self):
         return self.name
@@ -28,8 +28,8 @@ class Genre(models.Model):
         max_length=50,
         unique=True,
         validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-        message='Содержит неизвестный символ')],
-    )
+                    message='Содержит неизвестный символ')],
+                )
 
     def __str__(self):
         return self.name

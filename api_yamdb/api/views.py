@@ -63,7 +63,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(CreateListDestroyViewSet):
     """Категории произведений"""
-    
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdministratorOrReadOnly,)

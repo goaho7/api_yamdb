@@ -13,13 +13,15 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.views import APIView
 
 from api.permissions import IsAdmin, IsAdministratorOrReadOnly, IsAuthorModeratorAdminOrReadOnly
-from api.serializers import (CategorySerializer, CommentSerializer,
+from api.serializers import (CategorySerializer, CommentSerializer, TitleCreateUpdateSerializer,
                              GenreSerializer, ReviewSerializer,
                              SignupSerializer, TitleSerializer,
                              TokenSerializer, UserSerializer,)
 from api_yamdb.settings import EMAIL
 from reviews.models import Category, Genre, Review, Title
 from .mixins import CreateListDestroyViewSet
+from .filters import FilterByTitle
+from django_filters.rest_framework import DjangoFilterBackend
 
 User = get_user_model()
 
@@ -82,11 +84,17 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Произведения"""
-
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    serializer_class = TitleSerializer
+    
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all().order_by('name')
     permission_classes = (IsAdministratorOrReadOnly,)
     pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = FilterByTitle
+
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PATCH'):
+            return TitleCreateUpdateSerializer
+        return TitleSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

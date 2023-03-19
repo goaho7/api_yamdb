@@ -1,4 +1,5 @@
 import re
+from django.utils import timezone
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -61,10 +62,36 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений"""
 
+    category = CategorySerializer()
+    genre = GenreSerializer(many=True)
+
     class Meta:
         fields = '__all__'
         model = Title
 
+
+class TitleCreateUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания и изменения произведений."""
+
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all(), many=False
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True
+    )
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Title
+
+    def validate_year(self, value):
+        """Проверка года выпуска произведения."""
+        current_year = timezone.now().year
+        if value > current_year:
+            raise serializers.ValidationError(
+                'Год выпуска не может превышать текущий год!'
+            )
+        return value
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор пользователей"""

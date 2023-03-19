@@ -61,7 +61,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(CreateListDestroyViewSet):
     """Категории произведений"""
-    
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdministratorOrReadOnly,)
@@ -82,7 +82,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Произведения"""
-    
+
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
     permission_classes = (IsAdministratorOrReadOnly,)

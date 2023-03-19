@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from .validators import validate_year, validate_regex
 from django.core.validators import RegexValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from reviews.validators import validate_year, validate_regex
 
 
 class Category(models.Model):

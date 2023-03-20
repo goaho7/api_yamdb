@@ -10,7 +10,6 @@ class CreateListDestroyViewSet(
     viewsets.GenericViewSet,
 ):
 
-
     pagination_class = PageNumberPagination
     permission_classes = (IsAdministratorOrReadOnly,)
     filter_backends = (filters.SearchFilter,)

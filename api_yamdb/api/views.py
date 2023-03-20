@@ -2,32 +2,35 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-     
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.views import APIView
 
-from api.permissions import IsAdmin, IsAdministratorOrReadOnly, IsAuthorModeratorAdminOrReadOnly
-from api.serializers import (CategorySerializer, CommentSerializer, TitleCreateUpdateSerializer,
+from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
+                             IsAuthorModeratorAdminOrReadOnly)
+from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
-                             SignupSerializer, TitleSerializer,
-                             TokenSerializer, UserSerializer,)
+                             SignupSerializer, TitleCreateUpdateSerializer,
+                             TitleSerializer, TokenSerializer, UserSerializer,)
 from api_yamdb.settings import EMAIL
+from api.filters import FilterByTitle
+from api.mixins import CreateListDestroyViewSet
 from reviews.models import Category, Genre, Review, Title
-from .mixins import CreateListDestroyViewSet
-from .filters import FilterByTitle
-from django_filters.rest_framework import DjangoFilterBackend
+
 
 User = get_user_model()
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Отзывы"""
+
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (
@@ -46,6 +49,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Комментарии"""
+
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (
@@ -87,8 +91,9 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Произведения"""
-    
-    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all().order_by('name')
+
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).all().order_by('name')
     permission_classes = (IsAdministratorOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
@@ -102,6 +107,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями"""
+
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -119,6 +125,7 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def me_method(self, request):
         """Метод редактирования при запросе на users/me/"""
+
         if request.method == 'GET':
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -135,6 +142,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class SignupView(APIView):
     """Создание пользователя и отправка кода подтверждения."""
+
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -159,6 +167,7 @@ class SignupView(APIView):
 
 class TokenView(APIView):
     """Получение JWT токена."""
+
     permission_classes = (AllowAny,)
 
     def post(self, request):

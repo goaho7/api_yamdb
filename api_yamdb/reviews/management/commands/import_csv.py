@@ -1,13 +1,14 @@
 import csv
 
 from django.core.management.base import BaseCommand
-from reviews.models import Category, Genre, Review, Title, User
+
+from reviews.models import Category, Genre, Review, Title, User, Comment
 
 path = 'static/data/'
 
 
 class Command(BaseCommand):
-    """"Заполняет базу данных из csv файлов"""
+    """Заполняет базу данных из csv файлов"""
 
     help = 'Заполняет базу данных данными из файлов'
 
@@ -32,6 +33,7 @@ class Command(BaseCommand):
         with open(f'{path}category.csv', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
+                print(row)
                 p = Category(
                     id=row['id'],
                     name=row['name'],
@@ -58,7 +60,7 @@ class Command(BaseCommand):
                     id=row['id'],
                     name=row['name'],
                     year=row['year'],
-                    category=Category.objects.get(id=row['category'])
+                    category=Category.objects.get(id=row['category']),
                 )
                 p.save
 
@@ -68,7 +70,7 @@ class Command(BaseCommand):
             for row in reader:
                 p = Review(
                     id=row['id'],
-                    title_id=Title.objects.get(id=row['title_id']),
+                    title=Title.objects.get(id=row['title_id']),
                     text=row['text'],
                     author=User.objects.get(id=row['author']),
                     score=row['score'],
@@ -80,10 +82,10 @@ class Command(BaseCommand):
         with open(f'{path}comments.csv', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                p = Category(
+                p = Comment(
                     id=row['id'],
-                    review_id=Review.objects.get(id=row['review_id']),
-                    text=row['slug'],
+                    review=Review.objects.get(id=row['review_id']),
+                    text=row['text'],
                     author=User.objects.get(id=row['author']),
                     pub_date=row['pub_date']
                 )

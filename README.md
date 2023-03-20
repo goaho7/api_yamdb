@@ -42,7 +42,7 @@
 
 #### 6. Для загрузки тестовых данных из csv-файлов выполните команду:
 
-    python3 api_yamdb/manage.py <название команды>  
+    python3 api_yamdb/manage.py import_csv.py  
 
 
 ## Ресурсы API YaMDb

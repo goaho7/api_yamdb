@@ -94,6 +94,7 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
             )
         return value
 
+
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор пользователей"""
     class Meta:

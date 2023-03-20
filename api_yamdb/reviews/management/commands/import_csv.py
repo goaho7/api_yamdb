@@ -15,4 +15,3 @@ class Command(BaseCommand):
             for row in reader:
                 title = User(**row)
                 title.save()
-                print(title)

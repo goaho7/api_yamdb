@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -14,7 +13,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        exclude = ('title',)
         model = Review
 
     def validate(self, data):
@@ -37,16 +36,15 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        exclude = ('review',)
         model = Comment
-        read_only_fields = ('review',)
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategoryReadOnlySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений"""
 
     class Meta:
-        exclude = ['id']
+        exclude = ('id',)
         model = Category
 
 
@@ -54,44 +52,36 @@ class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений"""
 
     class Meta:
-        exclude = ['id']
+        exclude = ('id',)
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений"""
 
-    category = CategorySerializer()
+    category = CategoryReadOnlySerializer()
     genre = GenreSerializer(many=True)
     rating = serializers.IntegerField()
 
     class Meta:
         fields = '__all__'
         model = Title
+        read_only_fields = ('category', 'genre', 'rating')
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и изменения произведений."""
 
     category = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Category.objects.all(), many=False
+        slug_field='slug', queryset=Category.objects.all()
     )
     genre = serializers.SlugRelatedField(
         slug_field='slug', queryset=Genre.objects.all(), many=True
     )
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = '__all__'
         model = Title
-
-    def validate_year(self, value):
-        """Проверка года выпуска произведения."""
-        current_year = timezone.now().year
-        if value > current_year:
-            raise serializers.ValidationError(
-                'Год выпуска не может превышать текущий год!'
-            )
-        return value
 
 
 class UserSerializer(serializers.ModelSerializer):

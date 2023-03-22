@@ -1,13 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
 from django.utils import timezone
-
-validate_regex = RegexValidator(
-    r'^[-a-zA-Z0-9_]+$',
-    'Содержит неизвестный символ'
-)
 
 
 def validate_year(value):

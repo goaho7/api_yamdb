@@ -2,7 +2,7 @@ from api.filters import FilterByTitle
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
                              IsAuthorModeratorAdminOrReadOnly)
-from api.serializers import (CategorySerializer, CommentSerializer,
+from api.serializers import (CategoryReadOnlySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
                              SignupSerializer, TitleCreateUpdateSerializer,
                              TitleSerializer, TokenSerializer, UserSerializer)
@@ -69,12 +69,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
     """Категории произведений"""
 
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = (IsAdministratorOrReadOnly,)
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
+    serializer_class = CategoryReadOnlySerializer
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -82,10 +77,6 @@ class GenreViewSet(CreateListDestroyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -99,9 +90,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = FilterByTitle
 
     def get_serializer_class(self):
-        if self.request.method in ('POST', 'PATCH'):
-            return TitleCreateUpdateSerializer
-        return TitleSerializer
+        if self.action in ['list', 'retrieve']:
+            return TitleSerializer
+        return TitleCreateUpdateSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -2,17 +2,18 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     RegexValidator)
 from django.db import models
-from reviews.validators import validate_regex, validate_year
+from reviews.validators import validate_year
+
+from api_yamdb.settings import MAX_LENGTH_NAME, MAX_LENGTH_SLUG
 
 
 class Category(models.Model):
     """Категории произведений"""
-    name = models.CharField('название категории', max_length=256)
+    name = models.CharField('название категории', max_length=MAX_LENGTH_NAME)
     slug = models.SlugField(
         'ссылка категории',
-        max_length=50,
+        max_length=MAX_LENGTH_SLUG,
         unique=True,
-        validators=[validate_regex],
     )
 
     def __str__(self):
@@ -21,12 +22,11 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Жанры произведений"""
-    name = models.CharField('название категории', max_length=256)
+    name = models.CharField('название категории', max_length=MAX_LENGTH_NAME)
     slug = models.SlugField(
         'ссылка категории',
-        max_length=50,
+        max_length=MAX_LENGTH_SLUG,
         unique=True,
-        validators=[validate_regex],
     )
 
     def __str__(self):
@@ -36,22 +36,22 @@ class Genre(models.Model):
 class Title(models.Model):
     """Произведения"""
 
-    name = models.CharField('название произведения', max_length=256)
+    name = models.CharField(
+        'название произведения',
+        max_length=MAX_LENGTH_NAME
+    )
     year = models.PositiveSmallIntegerField(
         'год создания произведения',
-        validators=[validate_year])
-
+        validators=[validate_year]
+    )
     genre = models.ManyToManyField(Genre, related_name='titles')
-
     category = models.ForeignKey(
         Category,
         related_name='titles',
         on_delete=models.SET_NULL,
         null=True)
-
-    description = models.CharField(
+    description = models.TextField(
         'описание произведения',
-        max_length=256,
         blank=True,
     )
 

@@ -14,7 +14,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        exclude = ('title',)
         model = Review
 
     def validate(self, data):
@@ -37,9 +37,8 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        exclude = ('review',)
         model = Comment
-        read_only_fields = ('review',)
 
 
 class CategorySerializer(serializers.ModelSerializer):

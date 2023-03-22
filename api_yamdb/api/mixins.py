@@ -1,7 +1,7 @@
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import PageNumberPagination
 
-from .permissions import IsAdministratorOrReadOnly
+from api.permissions import IsAdministratorOrReadOnly
 
 
 class CreateListDestroyViewSet(

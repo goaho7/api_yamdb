@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from api.filters import FilterByTitle
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
@@ -6,6 +8,7 @@ from api.serializers import (CategoryReadOnlySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
                              SignupSerializer, TitleCreateUpdateSerializer,
                              TitleSerializer, TokenSerializer, UserSerializer)
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -20,9 +23,16 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Review, Title
 
-from api_yamdb.settings import EMAIL
+from api.filters import FilterByTitle
+from api.mixins import CreateListDestroyViewSet
+from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
+                             IsAuthorModeratorAdminOrReadOnly)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, MeSerializer, ReviewSerializer,
+                             SignupSerializer, TitleCreateUpdateSerializer,
+                             TitleSerializer, TokenSerializer, UserSerializer)
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
@@ -110,31 +120,28 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
     pagination_class = LimitOffsetPagination
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
 
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
-        url_path='me',
         permission_classes=(IsAuthenticated,)
     )
-    def me_method(self, request):
+    def me(self, request):
         """Метод редактирования при запросе на users/me/"""
 
         if request.method == 'GET':
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        if request.method == 'PATCH':
-            serializer = UserSerializer(
-                request.user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save(role=request.user.role)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        serializer = MeSerializer(
+            request.user, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SignupView(APIView):
@@ -149,13 +156,10 @@ class SignupView(APIView):
             **serializer.validated_data,
         )
         confirmation_code = default_token_generator.make_token(user)
-        User.objects.filter(username=user.username).update(
-            confirmation_code=confirmation_code
-        )
         send_mail(
             'Код подтверждения.',
             f'Код для регистрации: {confirmation_code}',
-            EMAIL,
+            settings.EMAIL,
             [f'{user.email}'],
             fail_silently=False,
         )

@@ -121,7 +121,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PAGINATION_CLASS': ('rest_framework.pagination.LimitOffsetPagination'),
+    'DEFAULT_PAGINATION_CLASS': ('rest_framework.pagination.PageNumberPagination'),
     'PAGE_SIZE': 5,
 }
 
@@ -131,6 +131,8 @@ SIMPLE_JWT = {
 }
 
 DEFAULT_ROLE = 'user'
+MAX_LENGTH_NAME = 256
+MAX_LENGTH_SLUG = 50
 
 EMAIL = 'test6446test@yandex.ru'
 

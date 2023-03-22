@@ -3,13 +3,14 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from reviews.validators import (username_validator, validate_regex,
-                                validate_year)
+from reviews.validators import username_validator, validate_year
 
 
 class Category(models.Model):
     """Категории произведений"""
-    name = models.CharField('название категории', max_length=settings.MAX_LENGTH_NAME)
+    name = models.CharField(
+        'название категории', max_length=settings.MAX_LENGTH_NAME
+    )
     slug = models.SlugField(
         'ссылка категории',
         max_length=settings.MAX_LENGTH_SLUG,
@@ -22,7 +23,9 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Жанры произведений"""
-    name = models.CharField('название категории', max_length=settings.MAX_LENGTH_NAME)
+    name = models.CharField(
+        'название категории', max_length=settings.MAX_LENGTH_NAME
+    )
     slug = models.SlugField(
         'ссылка категории',
         max_length=settings.MAX_LENGTH_SLUG,

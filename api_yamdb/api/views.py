@@ -1,14 +1,4 @@
 from django.conf import settings
-
-from api.filters import FilterByTitle
-from api.mixins import CreateListDestroyViewSet
-from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
-                             IsAuthorModeratorAdminOrReadOnly)
-from api.serializers import (CategoryReadOnlySerializer, CommentSerializer,
-                             GenreSerializer, ReviewSerializer,
-                             SignupSerializer, TitleCreateUpdateSerializer,
-                             TitleSerializer, TokenSerializer, UserSerializer)
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -28,11 +18,11 @@ from api.filters import FilterByTitle
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
                              IsAuthorModeratorAdminOrReadOnly)
-from api.serializers import (CategorySerializer, CommentSerializer,
+from api.serializers import (CategoryReadOnlySerializer, CommentSerializer,
                              GenreSerializer, MeSerializer, ReviewSerializer,
                              SignupSerializer, TitleCreateUpdateSerializer,
                              TitleSerializer, TokenSerializer, UserSerializer)
-from reviews.models import Category, Genre, Review, Title
+from reviews.models import Category, Genre, Title
 
 User = get_user_model()
 

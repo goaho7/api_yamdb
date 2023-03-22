@@ -25,6 +25,7 @@
     python3 -m venv env
 
     source env/bin/activate
+    source venv/Scripts/activate (для windows)
 
 #### 3. Установить зависимости из файла requirements.txt:
 
@@ -42,7 +43,7 @@
 
 #### 6. Для загрузки тестовых данных из csv-файлов выполните команду:
 
-    python3 api_yamdb/manage.py import_csv.py  
+    python3 manage.py import_csv.py  
 
 
 ## Ресурсы API YaMDb

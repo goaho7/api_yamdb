@@ -1,3 +1,5 @@
+import re
+
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
@@ -14,4 +16,20 @@ def validate_year(value):
     if value > current_year:
         raise ValidationError(
             'Год выпуска произведения не должен превышать текущий год')
+    return value
+
+
+def username_validator(value):
+    if value.lower() == 'me':
+        raise ValidationError(
+            f'Нельзя использовать {value} как имя пользователя'
+        )
+    elif len(value) > 150:
+        raise ValidationError(
+            'Имя пользователя не должно быть больше 150 символов'
+        )
+    elif not re.fullmatch(r'^[\w.@+-]+\Z', value):
+        raise ValidationError(
+            'Имя пользователя содержит неверный символ'
+        )
     return value

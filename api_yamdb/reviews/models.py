@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    RegexValidator)
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from reviews.validators import validate_regex, validate_year
+
+from reviews.validators import (username_validator, validate_regex,
+                                validate_year)
 
 
 class Category(models.Model):
@@ -61,6 +63,7 @@ class Title(models.Model):
 
 class User(AbstractUser):
     """Кастомный пользователь"""
+
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
@@ -75,10 +78,7 @@ class User(AbstractUser):
         max_length=150,
         verbose_name='Имя пользователя',
         unique=True,
-        validators=[RegexValidator(
-            regex=r'^[\w.@+-]+\Z',
-            message='Содержит неизвестный символ'
-        )],
+        validators=[username_validator],
         help_text=('Required. 150 characters or fewer.'
                    'Letters, digits and @/./+/-/_ only.')
     )
@@ -90,24 +90,20 @@ class User(AbstractUser):
 
     email = models.EmailField(
         verbose_name='Почта',
-        unique=True,
-        max_length=254
+        unique=True
     )
 
     role = models.CharField(
         verbose_name='Роль',
-        default='user',
+        default=settings.DEFAULT_ROLE,
         choices=ROLES,
-        max_length=150
-    )
-
-    confirmation_code = models.CharField(
-        verbose_name='Код подтверждения',
-        blank=True,
-        max_length=150
+        max_length=19
     )
 
     class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
         constraints = [
             models.UniqueConstraint(
                 fields=['username', 'email'],
@@ -119,16 +115,12 @@ class User(AbstractUser):
         return self.username
 
     @property
-    def is_user(self):
-        return self.role == self.USER
-
-    @property
     def is_moderator(self):
         return self.role == self.MODERATOR
 
     @property
     def is_admin(self):
-        return self.role == self.ADMIN
+        return self.role == self.ADMIN or self.is_superuser or self.is_staff
 
 
 class Review(models.Model):

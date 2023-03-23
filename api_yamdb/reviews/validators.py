@@ -9,15 +9,16 @@ def validate_year(value):
     current_year = timezone.now().year
     if value > current_year:
         raise ValidationError(
-            'Год выпуска произведения не должен превышать текущий год')
+            'Год выпуска произведения не должен превышать текущий год'
+        )
     return value
 
 
 def username_validator(value):
     """Проверка поля username"""
 
-    pattern = r'^[\w.@+-]+\Z'
-    error_chars = ', '.join({i for i in value if re.sub(pattern, '', i)})
+    pattern = r'[\w.@+-]+'
+    error_chars = ', '.join(set(re.sub(pattern, '', value)))
     error_message = f'Строка содержит запрещенные символы: {error_chars}'
     if error_chars:
         raise ValidationError(error_message)

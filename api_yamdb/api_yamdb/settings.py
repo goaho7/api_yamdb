@@ -12,7 +12,10 @@ MAX_LENGTH_NAME = 256
 MAX_LENGTH_SLUG = 50
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    default='xq8vgoubry1a5c99ufagxpkuzqw1v6mkv1h2eid4pozpa9nuz5'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -123,6 +126,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': ('rest_framework.pagination.PageNumberPagination'),
     'PAGE_SIZE': 5,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
 }
 
 SIMPLE_JWT = {
@@ -133,6 +139,7 @@ SIMPLE_JWT = {
 DEFAULT_ROLE = 'user'
 MAX_LENGTH_NAME = 256
 MAX_LENGTH_SLUG = 50
+MAX_LENGTH_USERNAME = 150
 
 EMAIL = os.getenv('EMAIL')
 

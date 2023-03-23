@@ -14,16 +14,17 @@ def validate_year(value):
 
 
 def username_validator(value):
+    """Проверка поля username"""
+
+    pattern = r'^[\w.@+-]+\Z'
+    error_chars = ', '.join({i for i in value if re.sub(pattern, '', i)})
+    error_message = f'Строка содержит запрещенные символы: {error_chars}'
+    if error_chars:
+        raise ValidationError(error_message)
+
     if value.lower() == 'me':
         raise ValidationError(
             f'Нельзя использовать {value} как имя пользователя'
         )
-    elif len(value) > 150:
-        raise ValidationError(
-            'Имя пользователя не должно быть больше 150 символов'
-        )
-    elif not re.fullmatch(r'^[\w.@+-]+\Z', value):
-        raise ValidationError(
-            'Имя пользователя содержит неверный символ'
-        )
+
     return value

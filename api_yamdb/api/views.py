@@ -31,7 +31,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """Отзывы"""
 
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (
         IsAuthorModeratorAdminOrReadOnly,
         IsAuthenticatedOrReadOnly
@@ -52,7 +51,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Комментарии"""
 
     serializer_class = CommentSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (
         IsAuthorModeratorAdminOrReadOnly,
         IsAuthenticatedOrReadOnly
@@ -109,7 +107,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
-    pagination_class = LimitOffsetPagination
     http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)

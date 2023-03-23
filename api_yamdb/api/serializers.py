@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
+from api.custom_fields import UsernameCharField
 from reviews.models import Category, Comment, Genre, Review, Title
 from reviews.validators import username_validator
 
@@ -94,14 +95,10 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class MeSerializer(serializers.ModelSerializer):
+class MeSerializer(UserSerializer):
     """Сериализатор изменения данных своей учетной записи"""
 
-    class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        )
+    class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
 
@@ -112,7 +109,7 @@ class SignupSerializer(serializers.Serializer):
         required=True,
         max_length=254
     )
-    username = serializers.CharField(
+    username = UsernameCharField(
         required=True, validators=[username_validator]
     )
 
@@ -137,5 +134,7 @@ class SignupSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     """Сериализатор для получения JWT токена."""
 
-    username = serializers.CharField(required=True)
+    username = UsernameCharField(
+        required=True, validators=[username_validator]
+    )
     confirmation_code = serializers.CharField(required=True)

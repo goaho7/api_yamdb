@@ -12,7 +12,7 @@ MAX_LENGTH_NAME = 256
 MAX_LENGTH_SLUG = 50
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,7 +52,7 @@ TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,12 +134,11 @@ DEFAULT_ROLE = 'user'
 MAX_LENGTH_NAME = 256
 MAX_LENGTH_SLUG = 50
 
-EMAIL = 'test6446test@yandex.ru'
+EMAIL = os.getenv('EMAIL')
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'test6446test@yandex.ru'
-EMAIL_PASS = os.getenv('EMAIL_PASS')
-EMAIL_HOST_PASSWORD = EMAIL_PASS
+EMAIL_HOST_USER = os.getenv('EMAIL')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS')

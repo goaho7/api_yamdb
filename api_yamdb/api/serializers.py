@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
+from api.custom_fields import UsernameCharField
 from reviews.models import Category, Comment, Genre, Review, Title
 from reviews.validators import username_validator
 
@@ -40,7 +41,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
 
 
-class CategoryReadOnlySerializer(serializers.ModelSerializer):
+class CategoryReadSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений"""
 
     class Meta:
@@ -59,14 +60,13 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений"""
 
-    category = CategoryReadOnlySerializer()
-    genre = GenreSerializer(many=True)
-    rating = serializers.IntegerField()
+    category = CategoryReadSerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = '__all__'
         model = Title
-        read_only_fields = ('category', 'genre', 'rating')
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
@@ -94,14 +94,10 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class MeSerializer(serializers.ModelSerializer):
+class MeSerializer(UserSerializer):
     """Сериализатор изменения данных своей учетной записи"""
 
-    class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        )
+    class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
 
@@ -112,7 +108,7 @@ class SignupSerializer(serializers.Serializer):
         required=True,
         max_length=254
     )
-    username = serializers.CharField(
+    username = UsernameCharField(
         required=True, validators=[username_validator]
     )
 
@@ -137,5 +133,7 @@ class SignupSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     """Сериализатор для получения JWT токена."""
 
-    username = serializers.CharField(required=True)
+    username = UsernameCharField(
+        required=True, validators=[username_validator]
+    )
     confirmation_code = serializers.CharField(required=True)

@@ -40,7 +40,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
 
 
-class CategoryReadOnlySerializer(serializers.ModelSerializer):
+class CategoryReadSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений"""
 
     class Meta:
@@ -59,14 +59,13 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений"""
 
-    category = CategoryReadOnlySerializer()
-    genre = GenreSerializer(many=True)
-    rating = serializers.IntegerField()
+    category = CategoryReadSerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = '__all__'
         model = Title
-        read_only_fields = ('category', 'genre', 'rating')
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):

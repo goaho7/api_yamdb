@@ -15,13 +15,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.filters import FilterByTitle
-from api.mixins import CreateListDestroyViewSet
 from api.permissions import (IsAdmin, IsAdministratorOrReadOnly,
                              IsAuthorModeratorAdminOrReadOnly)
-from api.serializers import (CategoryReadOnlySerializer, CommentSerializer,
+from api.serializers import (CategoryReadSerializer, CommentSerializer,
                              GenreSerializer, MeSerializer, ReviewSerializer,
                              SignupSerializer, TitleCreateUpdateSerializer,
                              TitleSerializer, TokenSerializer, UserSerializer)
+from api.utils import GenreCategoryBaseViewSet
 from reviews.models import Category, Genre, Title
 
 User = get_user_model()
@@ -72,14 +72,14 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=self.get_review())
 
 
-class CategoryViewSet(CreateListDestroyViewSet):
+class CategoryViewSet(GenreCategoryBaseViewSet):
     """Категории произведений"""
 
     queryset = Category.objects.all()
-    serializer_class = CategoryReadOnlySerializer
+    serializer_class = CategoryReadSerializer
 
 
-class GenreViewSet(CreateListDestroyViewSet):
+class GenreViewSet(GenreCategoryBaseViewSet):
     """Жанры произведений"""
 
     queryset = Genre.objects.all()
@@ -90,7 +90,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Произведения"""
 
     queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')).all().order_by('name')
+        rating=Avg('reviews__score')).order_by('name')
     permission_classes = (IsAdministratorOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)

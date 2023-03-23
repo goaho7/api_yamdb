@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from api.permissions import IsAdministratorOrReadOnly
 
 
-class CreateListDestroyViewSet(
+class GenreCategoryBaseViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,

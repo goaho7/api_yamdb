@@ -34,7 +34,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         IsAuthorModeratorAdminOrReadOnly,
         IsAuthenticatedOrReadOnly
     )
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_title(self):
         return get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -92,6 +92,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdministratorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = FilterByTitle
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:

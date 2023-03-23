@@ -2,9 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from api.custom_fields import UsernameCharField
+from api.utils import UsernameCharField
 from reviews.models import Category, Comment, Genre, Review, Title
-from reviews.validators import username_validator
 
 User = get_user_model()
 
@@ -108,13 +107,7 @@ class SignupSerializer(serializers.Serializer):
         required=True,
         max_length=254
     )
-    username = UsernameCharField(
-        required=True, validators=[username_validator]
-    )
-
-    class Meta:
-        model = User
-        fields = ('username', 'email')
+    username = UsernameCharField(required=True)
 
     def validate(self, data):
         username = User.objects.filter(username=data.get('username')).exists()
@@ -133,7 +126,5 @@ class SignupSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     """Сериализатор для получения JWT токена."""
 
-    username = UsernameCharField(
-        required=True, validators=[username_validator]
-    )
+    username = UsernameCharField(required=True)
     confirmation_code = serializers.CharField(required=True)

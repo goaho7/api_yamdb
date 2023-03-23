@@ -45,7 +45,8 @@ class Title(models.Model):
     )
     year = models.PositiveSmallIntegerField(
         'год создания произведения',
-        validators=[validate_year]
+        validators=[validate_year],
+        db_index=True
     )
     genre = models.ManyToManyField(Genre, related_name='titles')
     category = models.ForeignKey(
@@ -76,12 +77,12 @@ class User(AbstractUser):
     )
 
     username = models.CharField(
-        max_length=150,
+        max_length=settings.MAX_LENGTH_USERNAME,
         verbose_name='Имя пользователя',
         unique=True,
         validators=[username_validator],
-        help_text=('Required. 150 characters or fewer.'
-                   'Letters, digits and @/./+/-/_ only.')
+        help_text=(f'Required. {settings.MAX_LENGTH_USERNAME}'
+                   'characters or fewer. Letters, digits and @/./+/-/_ only.')
     )
 
     bio = models.TextField(
